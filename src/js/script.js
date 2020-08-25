@@ -3,15 +3,15 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Элементы меню (фитнес и т.д.)
   const tabs = document.querySelectorAll('.tabheader__item'),
-    // Сами табы
-    tabsContent = document.querySelectorAll('.tabcontent'),
-    // Родитель эл-ов меню для делегирования
-    tabsParent = document.querySelector('.tabheader__items');
+        // Сами табы
+        tabsContent = document.querySelectorAll('.tabcontent'),
+        // Родитель эл-ов меню для делегирования
+        tabsParent = document.querySelector('.tabheader__items');
   hideTabContent();
   // Можно без п-ов, будет отобр. первый элемент фитнес
   showTabContent();
 
-  // Скроем все табы для начала
+   // Скроем все табы для начала
   function hideTabContent() {
     // Инлайн-стили
     // tabsContent.forEach(item => item.style.display = 'none');
