@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }); // Timer
 
-  const deadline = '2020-08-28 18:58:00'; // Расчет временных промежутков
+  const deadline = '2020-08-31 18:58:00'; // Расчет временных промежутков
 
   function getTimeRemaining(endtime) {
     const t = new Date(endtime).getTime() - Date.now(),
