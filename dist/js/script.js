@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }); // Timer
 
-  const deadline = '2020-08-31 18:58:00'; // Расчет временных промежутков
+  const deadline = '2020-09-02 18:58:00'; // Расчет временных промежутков
 
   function getTimeRemaining(endtime) {
     const t = new Date(endtime).getTime() - Date.now(),
@@ -222,23 +222,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalTrigger = document.querySelectorAll('[data-modal]'),
         modal = document.querySelector('.modal'),
         modalCloseBtn = modal.querySelector('[data-close]');
-  modalTrigger.forEach(item => {
-    item.addEventListener('click', () => {
-      modal.classList.add('show');
-      modal.classList.remove('hide'); // Можно исп. toggle
-      // modal.classList.toggle('show');
 
-      document.body.style.overflow = 'hidden';
-    });
-  });
-  modalCloseBtn.addEventListener('click', closeModal);
+  function openModal(e) {
+    modal.classList.add('show');
+    modal.classList.remove('hide'); // Можно исп. toggle
+    // modal.classList.toggle('show');
+
+    document.body.style.overflow = 'hidden'; // Чтобы не открывалось по таймеру, если польз. открыл вручную
+
+    clearTimeout(modalTimerId); // Чтобы при срабатывании таймера не сработало открытие при докрутке
+    // e - undefined
+
+    if (!e) {
+      window.removeEventListener('scroll', showModalByScroll);
+    }
+  }
 
   function closeModal() {
     modal.classList.add('hide');
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-  } // Закрытие по клику на "подложку"
+    modal.classList.remove('show'); // Можно исп. toggle
+    // modal.classList.toggle('show');
 
+    document.body.style.overflow = '';
+  }
+
+  modalTrigger.forEach(item => {
+    item.addEventListener('click', openModal);
+  });
+  modalCloseBtn.addEventListener('click', closeModal); // Закрытие по клику на "подложку"
 
   modal.addEventListener('click', e => {
     // Мой вариант
@@ -257,7 +268,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.code == 'Escape' && modal.classList.contains('show')) {
       closeModal();
     }
-  });
+  }); // Мод. окно откроется через какое-то время
+
+  const modalTimerId = setTimeout(openModal, 7000); // Мод.окно откр. при докрутке до конца
+
+  function showModalByScroll() {
+    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+      openModal();
+    }
+
+    console.log(document.documentElement.scrollHeight); // Тот же результат
+    // console.log(document.documentElement.offsetHeight);
+
+    console.log(document.documentElement.clientHeight);
+    console.log(window.pageYOffset);
+  }
+
+  window.addEventListener('scroll', showModalByScroll);
 });
 
 /***/ })

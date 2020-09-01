@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Timer
 
-  const deadline = '2020-08-31 18:58:00';
+  const deadline = '2020-09-02 18:58:00';
 
   // Расчет временных промежутков
   function getTimeRemaining(endtime) {
@@ -143,25 +143,37 @@ document.addEventListener('DOMContentLoaded', () => {
     modal = document.querySelector('.modal'),
     modalCloseBtn = modal.querySelector('[data-close]');
 
-  modalTrigger.forEach(item => {
-    item.addEventListener('click', () => {
-      modal.classList.add('show');
-      modal.classList.remove('hide');
-      // Можно исп. toggle
-      // modal.classList.toggle('show');
+  function openModal(e) {
+    modal.classList.add('show');
+    modal.classList.remove('hide');
+    // Можно исп. toggle
+    // modal.classList.toggle('show');
 
-      document.body.style.overflow = 'hidden';
-    });
-  });
+    document.body.style.overflow = 'hidden';
 
-  modalCloseBtn.addEventListener('click', closeModal);
+    // Чтобы не открывалось по таймеру, если польз. открыл вручную
+    clearTimeout(modalTimerId);
+    // Чтобы при срабатывании таймера не сработало открытие при докрутке
+    // e - undefined
+    if (!e) {
+      window.removeEventListener('scroll', showModalByScroll);
+    }
+  }
 
   function closeModal() {
     modal.classList.add('hide');
     modal.classList.remove('show');
+    // Можно исп. toggle
+    // modal.classList.toggle('show');
 
     document.body.style.overflow = '';
   }
+
+  modalTrigger.forEach(item => {
+    item.addEventListener('click', openModal);
+  });
+
+  modalCloseBtn.addEventListener('click', closeModal);
 
   // Закрытие по клику на "подложку"
   modal.addEventListener('click', e => {
@@ -183,4 +195,20 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModal();
     }
   });
+
+  // Мод. окно откроется через какое-то время
+  const modalTimerId = setTimeout(openModal, 7000);
+
+  // Мод.окно откр. при докрутке до конца
+  function showModalByScroll() {
+    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+      openModal();
+    }
+    console.log(document.documentElement.scrollHeight);
+    // Тот же результат
+    // console.log(document.documentElement.offsetHeight);
+    console.log(document.documentElement.clientHeight);
+    console.log(window.pageYOffset);
+  }
+  window.addEventListener('scroll', showModalByScroll);
 });

@@ -6,15 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Элементы меню (фитнес и т.д.)
   const tabs = document.querySelectorAll('.tabheader__item'),
-        // Сами табы
-        tabsContent = document.querySelectorAll('.tabcontent'),
-        // Родитель эл-ов меню для делегирования
-        tabsParent = document.querySelector('.tabheader__items');
+    // Сами табы
+    tabsContent = document.querySelectorAll('.tabcontent'),
+    // Родитель эл-ов меню для делегирования
+    tabsParent = document.querySelector('.tabheader__items');
   hideTabContent();
   // Можно без п-ов, будет отобр. первый элемент фитнес
   showTabContent();
 
-   // Скроем все табы для начала
+  // Скроем все табы для начала
   function hideTabContent() {
     // Инлайн-стили
     // tabsContent.forEach(item => item.style.display = 'none');
@@ -55,18 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Timer
 
-  const deadline = '2020-08-31 18:58:00';
+  const deadline = '2020-09-02 18:58:00';
 
   // Расчет временных промежутков
   function getTimeRemaining(endtime) {
     const t = new Date(endtime).getTime() - Date.now(),
-    // const t = Date.parse(endtime) - Date.parse(new Date()),
-          days = Math.floor(t / (24 * 60 * 60 * 1000)),
-          // Может быть больше 24, поэтому берем остаток
-          hours = Math.floor(t / (1000 * 60 * 60) % 24),
-          minutes = Math.floor(t / (1000 * 60) % 60),
-          seconds = Math.floor(t / 1000 % 60);
-    
+      // const t = Date.parse(endtime) - Date.parse(new Date()),
+      days = Math.floor(t / (24 * 60 * 60 * 1000)),
+      // Может быть больше 24, поэтому берем остаток
+      hours = Math.floor(t / (1000 * 60 * 60) % 24),
+      minutes = Math.floor(t / (1000 * 60) % 60),
+      seconds = Math.floor(t / 1000 % 60);
+
     return {
       'total': t,
       days,
@@ -88,12 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Установка таймера
   function setTimer(selector, endtime) {
     const timer = document.querySelector(selector),
-          days = timer.querySelector('#days'),
-          hours = timer.querySelector('#hours'),
-          minutes = timer.querySelector('#minutes'),
-          seconds = timer.querySelector('#seconds'),
-          timerInterval = setInterval(updateTimer, 1000);
-    
+      days = timer.querySelector('#days'),
+      hours = timer.querySelector('#hours'),
+      minutes = timer.querySelector('#minutes'),
+      seconds = timer.querySelector('#seconds'),
+      timerInterval = setInterval(updateTimer, 1000);
+
     // Рекурсивный setTimeout
     // let timerInterval = setTimeout(updateTimer, 1000);
 
@@ -140,28 +140,40 @@ document.addEventListener('DOMContentLoaded', () => {
   // Modal
 
   const modalTrigger = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'),
-        modalCloseBtn = modal.querySelector('[data-close]');
+    modal = document.querySelector('.modal'),
+    modalCloseBtn = modal.querySelector('[data-close]');
 
-  modalTrigger.forEach(item => {
-    item.addEventListener('click', () => {
-      modal.classList.add('show');
-      modal.classList.remove('hide');
-      // Можно исп. toggle
-      // modal.classList.toggle('show');
+  function openModal(e) {
+    modal.classList.add('show');
+    modal.classList.remove('hide');
+    // Можно исп. toggle
+    // modal.classList.toggle('show');
 
-      document.body.style.overflow = 'hidden';
-    });
-  });
+    document.body.style.overflow = 'hidden';
 
-  modalCloseBtn.addEventListener('click', closeModal);
+    // Чтобы не открывалось по таймеру, если польз. открыл вручную
+    clearTimeout(modalTimerId);
+    // Чтобы при срабатывании таймера не сработало открытие при докрутке
+    // e - undefined
+    if (!e) {
+      window.removeEventListener('scroll', showModalByScroll);
+    }
+  }
 
   function closeModal() {
     modal.classList.add('hide');
     modal.classList.remove('show');
+    // Можно исп. toggle
+    // modal.classList.toggle('show');
 
     document.body.style.overflow = '';
   }
+  
+  modalTrigger.forEach(item => {
+    item.addEventListener('click', openModal);
+  });
+
+  modalCloseBtn.addEventListener('click', closeModal);
 
   // Закрытие по клику на "подложку"
   modal.addEventListener('click', e => {
@@ -183,4 +195,20 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModal();
     }
   });
+
+  // Мод. окно откроется через какое-то время
+  const modalTimerId = setTimeout(openModal, 7000);
+
+  // Мод.окно откр. при докрутке до конца
+  function showModalByScroll() {
+    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+      openModal();
+    }
+    console.log(document.documentElement.scrollHeight);
+    // Тот же результат
+    // console.log(document.documentElement.offsetHeight);
+    console.log(document.documentElement.clientHeight);
+    console.log(window.pageYOffset);
+  }
+  window.addEventListener('scroll', showModalByScroll);
 });
