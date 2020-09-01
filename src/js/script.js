@@ -136,4 +136,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   setTimer('.timer', deadline);
+
+  // Modal
+
+  const modalTrigger = document.querySelectorAll('[data-modal]'),
+        modal = document.querySelector('.modal'),
+        modalCloseBtn = modal.querySelector('[data-close]');
+
+  modalTrigger.forEach(item => {
+    item.addEventListener('click', () => {
+      modal.classList.add('show');
+      modal.classList.remove('hide');
+      // Можно исп. toggle
+      // modal.classList.toggle('show');
+
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  modalCloseBtn.addEventListener('click', closeModal);
+
+  function closeModal() {
+    modal.classList.add('hide');
+    modal.classList.remove('show');
+
+    document.body.style.overflow = '';
+  }
+
+  // Закрытие по клику на "подложку"
+  modal.addEventListener('click', e => {
+    // Мой вариант
+    // if (e.target.classList.contains('modal')) {
+    // В уроке
+    // Бывает, не передают объект события, а
+    // обращаются к event.target..
+    // Так делать НЕ НАДО
+    // if (event.target == modal) {
+    if (e.target == modal) {
+      closeModal();
+    }
+  });
+
+  // Закрытие по клику на esc
+  document.addEventListener('keydown', e => {
+    if (e.code == 'Escape' && modal.classList.contains('show')) {
+      closeModal();
+    }
+  });
 });
