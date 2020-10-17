@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Мод. окно откроется через какое-то время
-  // const modalTimerId = setTimeout(openModal, 7000);
+  const modalTimerId = setTimeout(openModal, 7000);
 
   // Мод.окно откр. при докрутке до конца
   function showModalByScroll() {
@@ -289,4 +289,68 @@ document.addEventListener('DOMContentLoaded', () => {
     '.menu .container',
     'menu__item'
   ).render();
+  
+  // Forms
+
+  const forms = document.forms;
+  // Для блока после формы - состояние запроса для пользователя
+  const message = {
+    loading: 'Загрузка',
+    success: 'Спасибо, скоро мы с вами свяжемся',
+    failure: 'Что-то пошло не так'
+  };
+  
+  for (let form of forms) {
+    postData(form);
+  }
+
+  function postData(form) {
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+
+      const statusMessage = document.createElement('div');
+      statusMessage.classList.add('status');
+      statusMessage.textContent = message.loading;
+      form.append(statusMessage);
+
+      const request = new XMLHttpRequest();
+      request.open('POST', '/server.php');
+      // Заголовок, используя FormData
+      // Такой заголовок не сработает!!! (будет пустой ответ) + нужна последняя версия PHP, иначе - ошибка
+      // См. вкладку Network в devtools
+      // request.setRequestHeader('Content-type', 'multipart/form-data');
+
+      // Передадим данные с пом. объекта FormData
+      const formData = new FormData(form);
+      
+      // Но, напр., нам нужно передать в формате JSON
+      request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+      // Нужно преобр. FormData в JSON
+      const obj = {};
+      formData.forEach((value, key) => {
+        obj[key] = value;
+      });
+      // Конвертируем в JSON
+      const json = JSON.stringify(obj);
+
+      // Отправим
+      // request.send(formData);
+      // Как JSON
+      request.send(json);
+
+      request.addEventListener('load', () => {
+        if (request.status == 200) {
+          console.log(request.response);
+          statusMessage.textContent = message.success;
+          // Очистим форму и удалим блок с сообщением
+          form.reset();
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 2000);
+        } else {
+          statusMessage.textContent = message.failure;
+        }
+      });
+    });
+  }
 });
