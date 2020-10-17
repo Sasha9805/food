@@ -204,11 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
       openModal();
     }
-    console.log(document.documentElement.scrollHeight);
-    // Тот же результат
-    // console.log(document.documentElement.offsetHeight);
-    console.log(document.documentElement.clientHeight);
-    console.log(window.pageYOffset);
   }
   window.addEventListener('scroll', showModalByScroll);
 
