@@ -1882,8 +1882,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Tabs
+  // Функция предварительной загрузки изображения спиннера
+  function preloadImg(sources) {
+    for (let src of sources) {
+      let img = document.createElement('img');
+      img.src = src;
+    }
+  }
+
+  preloadImg(['img/form/spinner.svg']); // Tabs
   // Элементы меню (фитнес и т.д.)
+
   const tabs = document.querySelectorAll('.tabheader__item'),
         // Сами табы
   tabsContent = document.querySelectorAll('.tabcontent'),
@@ -2005,8 +2014,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimer('.timer', deadline); // Modal
 
   const modalTrigger = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'),
-        modalCloseBtn = modal.querySelector('[data-close]');
+        modal = document.querySelector('.modal');
 
   function openModal(e) {
     modal.classList.add('show');
@@ -2033,8 +2041,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   modalTrigger.forEach(item => {
     item.addEventListener('click', openModal);
-  });
-  modalCloseBtn.addEventListener('click', closeModal); // Закрытие по клику на "подложку"
+  }); // Закрытие по клику на "подложку"
 
   modal.addEventListener('click', e => {
     // Мой вариант
@@ -2044,7 +2051,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // обращаются к event.target..
     // Так делать НЕ НАДО
     // if (event.target == modal) {
-    if (e.target == modal) {
+    // Мой вариант
+    // if (e.target == modal || e.target.dataset.close != undefined) {
+    // С урока
+    if (e.target == modal || e.target.getAttribute('data-close') == '') {
       closeModal();
     }
   }); // Закрытие по клику на esc
@@ -2122,7 +2132,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const forms = document.forms; // Для блока после формы - состояние запроса для пользователя
 
   const message = {
-    loading: 'Загрузка',
+    // loading: 'Загрузка',
+    loading: 'img/form/spinner.svg',
     success: 'Спасибо, скоро мы с вами свяжемся',
     failure: 'Что-то пошло не так'
   };
@@ -2133,11 +2144,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function postData(form) {
     form.addEventListener('submit', event => {
-      event.preventDefault();
-      const statusMessage = document.createElement('div');
-      statusMessage.classList.add('status');
-      statusMessage.textContent = message.loading;
-      form.append(statusMessage);
+      event.preventDefault(); // const statusMessage = document.createElement('div');
+
+      const statusMessage = document.createElement('img');
+      statusMessage.src = message.loading; // Уст. по центру (лучше через css классы)
+
+      statusMessage.style.cssText = `
+        display: block;
+        margin: 0 auto;
+      `; // statusMessage.textContent = message.loading;
+      // form.append(statusMessage);
+      // Чтобы форма не уменьшалась при появлении спиннера
+
+      form.after(statusMessage);
       const request = new XMLHttpRequest();
       request.open('POST', '/server.php'); // Заголовок, используя FormData
       // Такой заголовок не сработает!!! (будет пустой ответ) + нужна последняя версия PHP, иначе - ошибка
@@ -2161,18 +2180,52 @@ document.addEventListener('DOMContentLoaded', () => {
       request.send(json);
       request.addEventListener('load', () => {
         if (request.status == 200) {
-          console.log(request.response);
-          statusMessage.textContent = message.success; // Очистим форму и удалим блок с сообщением
+          console.log(request.response); // statusMessage.textContent = message.success;
 
-          form.reset();
-          setTimeout(() => {
-            statusMessage.remove();
-          }, 2000);
+          showThanksModal(message.success); // Очистим форму и удалим блок с сообщением
+
+          form.reset(); // Это уже не нужно
+          // setTimeout(() => {
+          //   statusMessage.remove();
+          // }, 2000);
+
+          statusMessage.remove();
         } else {
-          statusMessage.textContent = message.failure;
+          // statusMessage.textContent = message.failure;
+          showThanksModal(message.failure);
+          form.reset();
+          statusMessage.remove();
         }
       });
     });
+  }
+
+  function showThanksModal(message) {
+    const prevModalDialog = document.querySelector('.modal__dialog'); // Нужно скрывать, а не удалять, чтобы в дальнейшем пользоваться изначальным функционалом
+
+    prevModalDialog.classList.add('hide'); // Заново открываем
+
+    openModal(); // Формируем новое modal__dialog
+
+    const thanksModal = document.createElement('div');
+    thanksModal.classList.add('modal__dialog'); // Чтоб крестик работал, нужно применить делегирование к modal
+
+    thanksModal.innerHTML = `
+      <div class="modal__content">
+        <div class="modal__close" data-close>&times;</div>
+        <div class="modal__title">${message}</div>
+      </div>
+    `; // Помещаем в div.modal
+
+    modal.append(thanksModal); // Через время новое мод. окно должно пропасть и появиться старое
+    // Напр., польз. заново захочет отпр. свои данные, а там должна быть форма
+
+    setTimeout(() => {
+      thanksModal.remove(); // prevModalDialog.classList.add('show');
+
+      prevModalDialog.classList.remove('hide');
+      closeModal();
+    }, 4000);
   }
 });
 
