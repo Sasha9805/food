@@ -326,8 +326,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // Чтобы форма не уменьшалась при появлении спиннера
       form.after(statusMessage);
 
-      const request = new XMLHttpRequest();
-      request.open('POST', '/server.php');
+      // const request = new XMLHttpRequest();
+      // request.open('POST', '/server.php');
       // Заголовок, используя FormData
       // Такой заголовок не сработает!!! (будет пустой ответ) + нужна последняя версия PHP, иначе - ошибка
       // См. вкладку Network в devtools
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData(form);
       
       // Но, напр., нам нужно передать в формате JSON
-      request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+      // request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
       // Нужно преобр. FormData в JSON
       const obj = {};
       formData.forEach((value, key) => {
@@ -349,27 +349,56 @@ document.addEventListener('DOMContentLoaded', () => {
       // Отправим
       // request.send(formData);
       // Как JSON
-      request.send(json);
+      // request.send(json);
 
-      request.addEventListener('load', () => {
-        if (request.status == 200) {
-          console.log(request.response);
-          // statusMessage.textContent = message.success;
-          showThanksModal(message.success);
-          // Очистим форму и удалим блок с сообщением
-          form.reset();
-          // Это уже не нужно
-          // setTimeout(() => {
-          //   statusMessage.remove();
-          // }, 2000);
-          statusMessage.remove();
-        } else {
-          // statusMessage.textContent = message.failure;
-          showThanksModal(message.failure);
-          form.reset();
-          statusMessage.remove();
-        }
+      // FETCH
+      // При server1.php все равно промис будет успешно выполнен
+      // Для fetch важно, что сам запрос вообще удалось сделать
+      // А если это ошибка HTTP, то промис не перейдет в состояние reject
+      // При server1 - 404 (запрашиваемый ресурс не найден)
+      // Если в Network поставить offline, то catch сработает
+      fetch('/server.php', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        // Для FormData заголовки не нужны!
+        // body: formData
+        body: json
+      })
+      // response.json() - сработает catch, а от сервера получим NULL
+      .then(response => response.text())
+      .then(data => {
+        console.log(data);
+        showThanksModal(message.success);
+      })
+      .catch(() => {
+        showThanksModal(message.failure);
+      })
+      .finally(() => {
+        form.reset();
+        statusMessage.remove();
       });
+
+      // request.addEventListener('load', () => {
+      //   if (request.status == 200) {
+      //     console.log(request.response);
+      //     // statusMessage.textContent = message.success;
+      //     showThanksModal(message.success);
+      //     // Очистим форму и удалим блок с сообщением
+      //     form.reset();
+      //     // Это уже не нужно
+      //     // setTimeout(() => {
+      //     //   statusMessage.remove();
+      //     // }, 2000);
+      //     statusMessage.remove();
+      //   } else {
+      //     // statusMessage.textContent = message.failure;
+      //     showThanksModal(message.failure);
+      //     form.reset();
+      //     statusMessage.remove();
+      //   }
+      // });
     });
   }
 
@@ -404,4 +433,20 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModal();
     }, 4000);
   }
+
+  // GET-запрос fetch
+  // fetch('https://jsonplaceholder.typicode.com/todos/1')
+  //   .then(response => response.json())
+  //   .then(json => console.log(json));
+
+  // POST
+  // fetch('https://jsonplaceholder.typicode.com/posts', {
+  //   method: 'POST',
+  //   body: JSON.stringify({name: 'John'}),
+  //   headers: {
+  //     'Content-type': 'application/json'
+  //   }
+  // })
+  //   .then(response => response.json())
+  //   .then(json => console.log(json));
 });
