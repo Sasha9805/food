@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Timer
 
-  const deadline = '2020-09-02 18:58:00';
+  const deadline = '2023-02-24 18:58:00';
 
   // Расчет временных промежутков
   function getTimeRemaining(endtime) {

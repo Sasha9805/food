@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/js/main.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/js/script.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -1867,10 +1867,10 @@ module.exports = g;
 
 /***/ }),
 
-/***/ "./src/js/main.js":
-/*!************************!*\
-  !*** ./src/js/main.js ***!
-  \************************/
+/***/ "./src/js/script.js":
+/*!**************************!*\
+  !*** ./src/js/script.js ***!
+  \**************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1932,7 +1932,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }); // Timer
 
-  const deadline = '2020-09-02 18:58:00'; // Расчет временных промежутков
+  const deadline = '2023-02-24 18:58:00'; // Расчет временных промежутков
 
   function getTimeRemaining(endtime) {
     const t = new Date(endtime).getTime() - Date.now(),
