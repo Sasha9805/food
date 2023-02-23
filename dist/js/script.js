@@ -1944,6 +1944,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const deadline = '2023-02-24 18:58:00'; // Расчет временных промежутков
 
   function getTimeRemaining(endtime) {
+    // Обработка прошедшей даты
+    // Тогда не нужно переносить в начало условие в updateTimer
+    // let days, hours, minutes, seconds;
+    // const t =  Date.parse(endtime) - Date.parse(new Date());
+    // if (t <= 0) {
+    //   days = 0;
+    //   hours = 0;
+    //   minutes = 0;
+    //   seconds = 0;
+    // } else {
+    //   // Считаем эти перем. из t
+    // }
     const t = new Date(endtime).getTime() - Date.now(),
           // const t = Date.parse(endtime) - Date.parse(new Date()),
     days = Math.floor(t / (24 * 60 * 60 * 1000)),
