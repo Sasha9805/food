@@ -641,7 +641,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			slideIndex = slideTo;
 			offset = +width.slice(0, -2) * (slideTo - 1);
 			slidesField.style.transform = `translateX(-${offset}px)`;
-			console.log(slideIndex, offset);
 
 			dots.forEach(dot => dot.style.opacity = '');
 			dots[slideIndex - 1].style.opacity = 1;
