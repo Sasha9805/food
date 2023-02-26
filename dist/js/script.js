@@ -2134,12 +2134,87 @@ document.addEventListener('DOMContentLoaded', () => {
       this.parent.append(element);
     }
 
-  } // Вызываем
+  }
+
+  const getResource = async url => {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    }
+
+    return res.json();
+  }; // getResource('http://localhost:3000/menu')
+  // 	.then(data => {
+  // 		data.forEach(({img, altimg, title, descr, price}) => {
+  // 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+  // 		});
+  // 	});
+  // Используем библиотеку axios (пока подключили через CDN)
 
 
-  new MenuCard("img/tabs/vegy.jpg", "vegy", 'Меню "Фитнес"', 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', 9, '.menu .container').render();
-  new MenuCard("img/tabs/elite.jpg", "elite", 'Меню “Премиум”', 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', 21, '.menu .container', 'menu__item', 'big').render();
-  new MenuCard("img/tabs/post.jpg", "post", 'Меню "Постное"', 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', 14, '.menu .container', 'menu__item').render(); // Forms
+  axios.get('http://localhost:3000/menu').then(data => {
+    console.log(data);
+    data.data.forEach(({
+      img,
+      altimg,
+      title,
+      descr,
+      price
+    }) => {
+      new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+    });
+  }); // Используем функцию вместо классов
+  // function createCard(data) {
+  // 	data.forEach(({img, altimg, title, descr, price}) => {
+  // 		const element = document.createElement('div');
+  // 		element.classList.add('menu__item');
+  // 		// Нужно дополнительно price перевести в грн
+  // 		element.innerHTML = `
+  //       <img src=${img} alt=${altimg}>
+  //       <h3 class="menu__item-subtitle">${title}</h3>
+  //       <div class="menu__item-descr">${descr}</div>
+  //       <div class="menu__item-divider"></div>
+  //       <div class="menu__item-price">
+  //           <div class="menu__item-cost">Цена:</div>
+  //           <div class="menu__item-total"><span>${price}</span> грн/день</div>
+  //       </div>
+  //     `;
+  // 		document.querySelector('.menu .container').append(element);
+  // 	});
+  // }
+  // getResource('http://localhost:3000/menu')
+  // 	.then(data => createCard(data));
+  // Вызываем
+  // new MenuCard(
+  // 	'img/tabs/vegy.jpg',
+  // 	'vegy',
+  // 	'Меню "Фитнес"',
+  // 	'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+  // 	9,
+  // 	'.menu .container',
+  // 	// 'menu__item'
+  // ).render();
+  // new MenuCard(
+  // 	'img/tabs/elite.jpg',
+  // 	'elite',
+  // 	'Меню “Премиум”',
+  // 	'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+  // 	21,
+  // 	'.menu .container',
+  // 	'menu__item',
+  // 	'big'
+  // ).render();
+  // new MenuCard(
+  // 	'img/tabs/post.jpg',
+  // 	'post',
+  // 	'Меню "Постное"',
+  // 	'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+  // 	14,
+  // 	'.menu .container',
+  // 	'menu__item'
+  // ).render();
+  // Forms
 
   const forms = document.forms; // Для блока после формы - состояние запроса для пользователя
 
@@ -2151,10 +2226,21 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   for (let form of forms) {
-    postData(form);
+    bindPostData(form);
   }
 
-  function postData(form) {
+  const postData = async (url, data) => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: data
+    });
+    return res.json();
+  };
+
+  function bindPostData(form) {
     form.addEventListener('submit', event => {
       event.preventDefault(); // const statusMessage = document.createElement('div');
 
@@ -2179,13 +2265,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData(form); // Но, напр., нам нужно передать в формате JSON
       // request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
       // Нужно преобр. FormData в JSON
+      // const obj = {};
+      // formData.forEach((value, key) => {
+      // 	obj[key] = value;
+      // });
+      // // Конвертируем в JSON
+      // const json = JSON.stringify(obj);
+      // Исп. Object.fromEntries()
 
-      const obj = {};
-      formData.forEach((value, key) => {
-        obj[key] = value;
-      }); // Конвертируем в JSON
-
-      const json = JSON.stringify(obj); // Отправим
+      const json = JSON.stringify(Object.fromEntries(formData.entries())); // Отправим
       // request.send(formData);
       // Как JSON
       // request.send(json);
@@ -2195,17 +2283,20 @@ document.addEventListener('DOMContentLoaded', () => {
       // А если это ошибка HTTP, то промис не перейдет в состояние reject
       // При server1 - 404 (запрашиваемый ресурс не найден)
       // Если в Network поставить offline, то catch сработает
+      // fetch('server.php', {
+      // 	method: 'POST',
+      // 	headers: {
+      // 		'Content-type': 'application/json'
+      // 	},
+      // 	// Для FormData заголовки не нужны!
+      // 	// body: formData
+      // 	body: json
+      // })
+      // Используем json-server, server.php не нужен
 
-      fetch('/server.php', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        // Для FormData заголовки не нужны!
-        // body: formData
-        body: json
-      }) // response.json() - сработает catch, а от сервера получим NULL
-      .then(response => response.text()).then(data => {
+      postData('http://localhost:3000/requests', json) // response.json() - сработает catch, а от сервера получим NULL
+      // .then(response => response.text())
+      .then(data => {
         console.log(data);
         showThanksModal(message.success);
       }).catch(() => {
@@ -2261,7 +2352,8 @@ document.addEventListener('DOMContentLoaded', () => {
       prevModalDialog.classList.remove('hide');
       closeModal();
     }, 4000);
-  } // GET-запрос fetch
+  } // Fake API jsonplaceholder
+  // GET-запрос fetch
   // fetch('https://jsonplaceholder.typicode.com/todos/1')
   //   .then(response => response.json())
   //   .then(json => console.log(json));
@@ -2275,6 +2367,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // })
   //   .then(response => response.json())
   //   .then(json => console.log(json));
+  // db.json
+  // fetch('http://localhost:3000/menu')
+  //   .then(data => data.json())
+  //   .then(res => console.log(res))
 
 });
 
