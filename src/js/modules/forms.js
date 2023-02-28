@@ -1,4 +1,7 @@
-function forms() {
+import { closeModal, openModal } from './modal';
+import { postData } from '../services/services';
+
+function forms(modalTimerId) {
 	// Forms
 
 	const forms = document.forms;
@@ -13,18 +16,6 @@ function forms() {
 	for (let form of forms) {
 		bindPostData(form);
 	}
-
-	const postData = async (url, data) => {
-		const res = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-type': 'application/json'
-			},
-			body: data
-		});
-
-		return res.json();
-	};
 
 	function bindPostData(form) {
 		form.addEventListener('submit', event => {
@@ -130,7 +121,7 @@ function forms() {
 		// Нужно скрывать, а не удалять, чтобы в дальнейшем пользоваться изначальным функционалом
 		prevModalDialog.classList.add('hide');
 		// Заново открываем
-		openModal();
+		openModal('.modal', modalTimerId);
 
 		// Формируем новое modal__dialog
 		const thanksModal = document.createElement('div');
@@ -144,7 +135,7 @@ function forms() {
     `;
 
 		// Помещаем в div.modal
-		modal.append(thanksModal);
+		document.querySelector('.modal').append(thanksModal);
 
 		// Через время новое мод. окно должно пропасть и появиться старое
 		// Напр., польз. заново захочет отпр. свои данные, а там должна быть форма
@@ -152,7 +143,7 @@ function forms() {
 			thanksModal.remove();
 			// prevModalDialog.classList.add('show');
 			prevModalDialog.classList.remove('hide');
-			closeModal();
+			closeModal('.modal');
 		}, 4000);
 	}
 
@@ -179,4 +170,4 @@ function forms() {
 	//   .then(res => console.log(res))
 }
 
-module.exports = forms;
+export default forms;

@@ -1,7 +1,5 @@
-function timer() {
+function timer(selector, deadline) {
 	// Timer
-
-	const deadline = '2023-03-24 18:58:00';
 
 	// Расчет временных промежутков
 	function getTimeRemaining(endtime) {
@@ -93,7 +91,7 @@ function timer() {
 		}
 	}
 
-	setTimer('.timer', deadline);
+	setTimer(selector, deadline);
 }
 
-module.exports = timer;
+export default timer;
