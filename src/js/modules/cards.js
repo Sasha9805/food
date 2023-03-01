@@ -1,4 +1,5 @@
 import { getResource } from '../services/services';
+import axios from 'axios';
 
 function cards() { 
 	// Используем классы для карточек
@@ -48,21 +49,21 @@ function cards() {
 		}
 	}
 
-	getResource('http://localhost:3000/menu')
-		.then(data => {
-			data.forEach(({img, altimg, title, descr, price}) => {
-				new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-			});
-		});
-
-	// Используем библиотеку axios (пока подключили через CDN)
-	// axios.get('http://localhost:3000/menu')
+	// getResource('http://localhost:3000/menu')
 	// 	.then(data => {
-	// 		console.log(data);
-	// 		data.data.forEach(({img, altimg, title, descr, price}) => {
+	// 		data.forEach(({img, altimg, title, descr, price}) => {
 	// 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
 	// 		});
 	// 	});
+
+	// Используем библиотеку axios (пока подключили через CDN)
+	axios.get('http://localhost:3000/menu')
+		.then(data => {
+			console.log(data);
+			data.data.forEach(({img, altimg, title, descr, price}) => {
+				new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+			});
+		});
 
 	// Используем функцию вместо классов
 	// function createCard(data) {
